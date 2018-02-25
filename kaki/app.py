@@ -28,6 +28,8 @@ except ImportError:
 
 class E(ExceptionHandler):
     def handle_exception(self, inst):
+        if isinstance(inst, KeyboardInterrupt):
+            return ExceptionManager.RAISE
         App.get_running_app().set_error(inst, tb=traceback.format_exc())
         return ExceptionManager.PASS
 
@@ -50,7 +52,9 @@ class App(BaseApp):
     KV_FILES = []
 
     #: List of path to watch for autoreloading
-    AUTORELOADER_PATHS = []
+    AUTORELOADER_PATHS = [
+        (".", {"recursive": False}),
+    ]
 
     #: List of extensions to ignore
     AUTORELOADER_IGNORE_EXTS = ["*.pyc"]
@@ -176,17 +180,22 @@ class App(BaseApp):
         handler.dispatch = self._reload_from_watchdog
         self._observer = observer = Observer()
         for path in self.AUTORELOADER_PATHS:
+            options = {"recursive": True}
+            if isinstance(path, (tuple, list)):
+                path, options = path
             observer.schedule(
                 handler, join(rootpath, path),
-                recursive=True)
+                **options)
         observer.start()
 
     def _reload_from_watchdog(self, event):
         from watchdog.events import FileModifiedEvent
         if not isinstance(event, FileModifiedEvent):
             return
-        if event.src_path.endswith(".pyc"):
-            return
+
+        for ext in self.AUTORELOADER_IGNORE_EXTS:
+            if event.src_path.endswith(ext):
+                return
 
         if event.src_path.endswith(".py"):
             # source changed, reload it
@@ -204,6 +213,27 @@ class App(BaseApp):
     def _reload_py(self, filename):
         # we don't have dependency graph yet, so if the module actually exists
         # reload it.
+
+        filename = realpath(filename)
+        is_main = self.__class__.__module__ == "__main__"
+
+        # check if it's our own application file
+        try:
+            mod = sys.modules[self.__class__.__module__]
+            mod_filename = realpath(mod.__file__)
+        except Exception as e:
+            mod_filename = None
+
+        # detect if it's the application class // main
+        if mod_filename == filename or is_main:
+            return self._restart_app(mod)
+
+        module = self._filename_to_module(filename)
+        if module in sys.modules:
+            Logger.debug("{}: Module exist, reload it".format(self.appname))
+            reload(sys.modules[module])
+
+    def _filename_to_module(self, filename):
         orig_filename = filename
         rootpath = self.get_root_path()
         if filename.startswith(rootpath):
@@ -213,9 +243,21 @@ class App(BaseApp):
         module = filename[:-3].replace("/", ".")
         Logger.debug("{}: Translated {} to {}".format(
             self.appname, orig_filename, module))
-        if module in sys.modules:
-            Logger.debug("{}: Module exist, reload it".format(self.appname))
-            reload(sys.modules[module])
+        return module
+
+    def _restart_app(self, mod):
+        _has_execv = sys.platform != 'win32'
+        cmd = [sys.executable] + sys.argv
+        if not _has_execv:
+            import subprocess
+            subprocess.Popen(cmd)
+            sys.exit(0)
+        else:
+            try:
+                os.execv(sys.executable, cmd)
+            except OSError:
+                os.spawnv(os.P_NOWAIT, sys.executable, cmd)
+                os._exit(0)
 
     def prepare_foreground_lock(self):
         """
