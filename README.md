@@ -11,3 +11,5 @@ This library enhance Kivy frameworks with opiniated features such as:
 
 - State management
 - API (easy class to communicate with external api, download medias, etc)
+- Better logger (based on `logbook`)
+- Additionnal widgets (`ProgressSpinner`, `SwitchContainer`, `CoverImage`)
