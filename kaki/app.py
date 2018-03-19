@@ -106,9 +106,7 @@ class App(BaseApp):
         """
         for path in self.KV_FILES:
             path = realpath(path)
-            print("unload", path)
             Builder.unload_file(path)
-            print(Builder.files)
         for name, module in self.CLASSES.items():
             Factory.unregister(name)
 
@@ -118,7 +116,6 @@ class App(BaseApp):
         This is called before rebuild.
         """
         for path in self.KV_FILES:
-            print("load", path)
             path = realpath(path)
             Builder.load_file(path)
         for name, module in self.CLASSES.items():
