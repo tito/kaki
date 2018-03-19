@@ -53,11 +53,14 @@ class App(BaseApp):
 
     #: List of path to watch for autoreloading
     AUTORELOADER_PATHS = [
-        (".", {"recursive": False}),
+        # (".", {"recursive": False}),
     ]
 
     #: List of extensions to ignore
     AUTORELOADER_IGNORE_EXTS = ["*.pyc"]
+
+    #: Factory classes managed by kaki
+    CLASSES = {}
 
     __events__ = ["on_idle", "on_wakeup"]
 
@@ -102,7 +105,10 @@ class App(BaseApp):
         Usually happen before a reload
         """
         for path in self.KV_FILES:
+            path = realpath(path)
+            print("unload", path)
             Builder.unload_file(path)
+            print(Builder.files)
         for name, module in self.CLASSES.items():
             Factory.unregister(name)
 
@@ -112,6 +118,8 @@ class App(BaseApp):
         This is called before rebuild.
         """
         for path in self.KV_FILES:
+            print("load", path)
+            path = realpath(path)
             Builder.load_file(path)
         for name, module in self.CLASSES.items():
             Factory.register(name, module=module)
@@ -215,7 +223,6 @@ class App(BaseApp):
         # reload it.
 
         filename = realpath(filename)
-        is_main = self.__class__.__module__ == "__main__"
 
         # check if it's our own application file
         try:
@@ -225,7 +232,7 @@ class App(BaseApp):
             mod_filename = None
 
         # detect if it's the application class // main
-        if mod_filename == filename or is_main:
+        if mod_filename == filename:
             return self._restart_app(mod)
 
         module = self._filename_to_module(filename)
@@ -360,7 +367,8 @@ class App(BaseApp):
         Builder.load_string = self._builder_load_string
 
     def _builder_load_string(self, string, **kwargs):
-        from inspect import getframeinfo, stack
-        caller = getframeinfo(stack()[1][0])
-        kwargs["filename"] = caller.filename
+        if "filename" not in kwargs:
+            from inspect import getframeinfo, stack
+            caller = getframeinfo(stack()[1][0])
+            kwargs["filename"] = caller.filename
         return Builder.orig_load_string(string, **kwargs)
