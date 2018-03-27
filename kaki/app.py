@@ -9,6 +9,7 @@ import os
 import sys
 import traceback
 from os.path import join, realpath
+from fnmatch import fnmatch
 from kivy.app import App as BaseApp
 from kivy.logger import Logger
 from kivy.clock import Clock, mainthread
@@ -57,7 +58,7 @@ class App(BaseApp):
     ]
 
     #: List of extensions to ignore
-    AUTORELOADER_IGNORE_EXTS = ["*.pyc"]
+    AUTORELOADER_IGNORE_PATTERNS = ["*.pyc"]
 
     #: Factory classes managed by kaki
     CLASSES = {}
@@ -198,8 +199,8 @@ class App(BaseApp):
         if not isinstance(event, FileModifiedEvent):
             return
 
-        for ext in self.AUTORELOADER_IGNORE_EXTS:
-            if event.src_path.endswith(ext):
+        for pat in self.AUTORELOADER_IGNORE_PATTERNS:
+            if fnmatch(event.src_path, pat):
                 return
 
         if event.src_path.endswith(".py"):
