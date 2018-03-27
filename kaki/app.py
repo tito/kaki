@@ -63,6 +63,13 @@ class App(BaseApp):
     #: Factory classes managed by kaki
     CLASSES = {}
 
+    #: Idle detection (if True, event on_idle/on_wakeup will be fired)
+    #: Rearming idle can also be done with rearm_idle()
+    IDLE_DETECTION = False
+
+    #: Default idle timeout
+    IDLE_TIMEOUT = 60
+
     __events__ = ["on_idle", "on_wakeup"]
 
     def build(self):
@@ -78,6 +85,9 @@ class App(BaseApp):
         self.approot = None
         self.root = self.get_root()
         self.rebuild(first=True)
+
+        if self.IDLE_DETECTION:
+            self.install_idle(timeout=self.IDLE_TIMEOUT)
 
         return super(App, self).build()
 
