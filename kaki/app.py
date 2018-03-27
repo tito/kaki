@@ -29,7 +29,7 @@ except ImportError:
 
 class E(ExceptionHandler):
     def handle_exception(self, inst):
-        if isinstance(inst, KeyboardInterrupt):
+        if isinstance(inst, (KeyboardInterrupt, SystemExit)):
             return ExceptionManager.RAISE
         App.get_running_app().set_error(inst, tb=traceback.format_exc())
         return ExceptionManager.PASS
