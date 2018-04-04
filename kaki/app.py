@@ -246,7 +246,26 @@ class App(BaseApp):
         module = self._filename_to_module(filename)
         if module in sys.modules:
             Logger.debug("{}: Module exist, reload it".format(self.appname))
+            Factory.unregister_from_filename(filename)
+            self._unregister_factory_from_module(module)
             reload(sys.modules[module])
+
+    def _unregister_factory_from_module(self, module):
+        # check module directly
+        to_remove = [
+            x for x in Factory.classes
+            if Factory.classes[x]["module"] == module]
+
+        # check class name
+        for x in Factory.classes:
+            cls = Factory.classes[x]["cls"]
+            if not cls:
+                continue
+            if getattr(cls, "__module__", None) == module:
+                to_remove.append(x)
+
+        for name in set(to_remove):
+            del Factory.classes[name]
 
     def _filename_to_module(self, filename):
         orig_filename = filename
