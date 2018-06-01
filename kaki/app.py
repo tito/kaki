@@ -31,6 +31,9 @@ class E(ExceptionHandler):
     def handle_exception(self, inst):
         if isinstance(inst, (KeyboardInterrupt, SystemExit)):
             return ExceptionManager.RAISE
+        app = App.get_running_app()
+        if not app.DEBUG and not app.RAISE_ERROR:
+            return ExceptionManager.RAISE
         App.get_running_app().set_error(inst, tb=traceback.format_exc())
         return ExceptionManager.PASS
 
@@ -69,6 +72,12 @@ class App(BaseApp):
 
     #: Default idle timeout
     IDLE_TIMEOUT = 60
+
+    #: Raise error
+    #: When the DEBUG is activated, it will raise any error instead
+    #: of showing it on the screen. If you still want to show the error
+    #: when not in DEBUG, put this to False
+    RAISE_ERROR = True
 
     __events__ = ["on_idle", "on_wakeup"]
 
@@ -147,6 +156,8 @@ class App(BaseApp):
             import traceback
             Logger.exception("{}: Error when building app".format(self.appname))
             self.set_error(repr(e), traceback.format_exc())
+            if not self.DEBUG and self.RAISE_ERROR:
+                raise
 
     @mainthread
     def set_error(self, exc, tb=None):
@@ -222,6 +233,8 @@ class App(BaseApp):
                 import traceback
                 self.set_error(repr(e), traceback.format_exc())
                 return
+
+        print("reload cause of", event)
 
         Clock.unschedule(self.rebuild)
         Clock.schedule_once(self.rebuild, 0.1)
