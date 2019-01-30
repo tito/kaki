@@ -215,6 +215,7 @@ class App(BaseApp):
                 **options)
         observer.start()
 
+    @mainthread
     def _reload_from_watchdog(self, event):
         from watchdog.events import FileModifiedEvent
         if not isinstance(event, FileModifiedEvent):
