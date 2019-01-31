@@ -161,6 +161,7 @@ class App(BaseApp):
 
     @mainthread
     def set_error(self, exc, tb=None):
+        print(tb)
         from kivy.core.window import Window
         lbl = Factory.Label(
             text_size=(Window.width - 100, None),
