@@ -5,6 +5,9 @@ Kaki Application
 
 """
 
+import sys
+original_argv = sys.argv
+
 import os
 import sys
 import traceback
@@ -58,7 +61,8 @@ class App(BaseApp):
     ]
 
     #: List of extensions to ignore
-    AUTORELOADER_IGNORE_PATTERNS = ["*.pyc"]
+    AUTORELOADER_IGNORE_PATTERNS = [
+        "*.pyc", "*__pycache__*"]
 
     #: Factory classes managed by kaki
     CLASSES = {}
@@ -281,7 +285,7 @@ class App(BaseApp):
 
     def _restart_app(self, mod):
         _has_execv = sys.platform != 'win32'
-        cmd = [sys.executable] + sys.argv
+        cmd = [sys.executable] + original_argv
         if not _has_execv:
             import subprocess
             subprocess.Popen(cmd)
