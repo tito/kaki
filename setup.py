@@ -36,7 +36,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
-    install_requires=["kivy"],
+    install_requires=["kivy", "watchdog", "monotonic"],
     project_urls={
         "Bug Reports": "https://github.com/tito/kaki/issues",
         "Source": "https://github.com/tito/kaki/",
