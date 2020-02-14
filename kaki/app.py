@@ -151,6 +151,12 @@ class App(BaseApp):
         try:
             if not first:
                 self.unload_app_dependencies()
+
+            # in case the loading fail in the middle of building a widget
+            # there will be existing rules context that will break later
+            # instanciation. just clean it.
+            Builder.rulectx = {}
+
             self.load_app_dependencies()
             self.set_widget(None)
             self.approot = self.build_app()
@@ -239,8 +245,6 @@ class App(BaseApp):
                 import traceback
                 self.set_error(repr(e), traceback.format_exc())
                 return
-
-        print("reload cause of", event)
 
         Clock.unschedule(self.rebuild)
         Clock.schedule_once(self.rebuild, 0.1)
