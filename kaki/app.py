@@ -375,6 +375,8 @@ class App(BaseApp):
                     self.appname))
         self.idle_timer = None
         self.idle_timeout = timeout
+        Logger.info("{}: Install idle detector, {} seconds".format(
+            self.appname, timeout))
         Clock.schedule_interval(self._check_idle, 1)
         self.root.bind(
             on_touch_down=self.rearm_idle,
