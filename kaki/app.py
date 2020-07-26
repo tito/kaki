@@ -37,7 +37,7 @@ class E(ExceptionHandler):
         app = App.get_running_app()
         if not app.DEBUG and not app.RAISE_ERROR:
             return ExceptionManager.RAISE
-        App.get_running_app().set_error(inst, tb=traceback.format_exc())
+        app.set_error(inst, tb=traceback.format_exc())
         return ExceptionManager.PASS
 
 
