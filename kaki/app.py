@@ -38,6 +38,7 @@ class E(ExceptionHandler):
         if not app.DEBUG and not app.RAISE_ERROR:
             return ExceptionManager.RAISE
         app.set_error(inst, tb=traceback.format_exc())
+        traceback.print_exc()
         return ExceptionManager.PASS
 
 
@@ -171,7 +172,6 @@ class App(BaseApp):
 
     @mainthread
     def set_error(self, exc, tb=None):
-        print(tb)
         from kivy.core.window import Window
         lbl = Factory.Label(
             text_size=(Window.width - 100, None),
