@@ -1,3 +1,14 @@
 # -*- coding: utf-8 -*-
 
-__version__ = "0.1.5.dev0"
+MAJOR = 0
+MINOR = 1
+PATCH = 5
+
+RELEASE = False
+
+__version__ = "%d.%d.%d" % (MAJOR, MINOR, PATCH)
+
+__app_name__ = "Kaki App"
+
+if not RELEASE:
+    __version__ += ".dev0"
