@@ -30,6 +30,10 @@ except ImportError:
     PY3 = False
 
 
+from kaki import __appname__, __version__
+from kaki.utils.syslog import KakiLogger
+
+
 class E(ExceptionHandler):
     def handle_exception(self, inst):
         if isinstance(inst, (KeyboardInterrupt, SystemExit)):
@@ -88,6 +92,7 @@ class App(BaseApp):
 
     def build(self):
         if self.DEBUG:
+            KakiLogger.kaki_start()
             Logger.info("{}: Debug mode activated".format(self.appname))
             self.enable_autoreload()
             self.patch_builder()
