@@ -13,3 +13,4 @@ dist
 requirements.txt
 test
 test_dev.py
+test.py

@@ -93,6 +93,8 @@ class App(BaseApp):
     def build(self):
         if self.DEBUG:
             KakiLogger.kaki_start()
+            KakiLogger.watch_kv(self.KV_FILES)
+            KakiLogger.watch_kv_classes(self.CLASSES)
             Logger.info("{}: Debug mode activated".format(self.appname))
             self.enable_autoreload()
             self.patch_builder()
