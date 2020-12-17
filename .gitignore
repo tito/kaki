@@ -7,4 +7,9 @@ dist
 .DS_Store
 
 # 
+**.env
+**.vscode
 **.gitignore
+requirements.txt
+test
+test_dev.py

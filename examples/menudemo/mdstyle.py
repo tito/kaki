@@ -41,7 +41,7 @@ class Main(MainApp, SecondApp):
     # class to watch
     CLASSES = {
         # screen manager
-        "ManagerScreens": "md_style.manager_screens", # look at the line 59
+        "ManagerScreens": "md_style.manager_screens",
 
         # screen one
         "ScreenOne": "md_style.screens.screen_one"
@@ -56,7 +56,7 @@ class Main(MainApp, SecondApp):
 
     # build app
     def build_app(self):
-        FMS = self.fms = Factory.ManagerScreens() # look at the line 59
+        FMS = self.fms = Factory.ManagerScreens()
 
         self.theme_cls.theme_style = "Dark"
 

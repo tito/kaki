@@ -137,7 +137,7 @@ __NOTE:__
 
 If you want to access and run it from your Code Editor or IDE. You need to open it from that directory.
 Otherwise it will be look like this:
-![image mdstyle](/examples/documentation/Kaki_Error_Example.png)
+![image error](/examples/documentation/Kaki_Error_Example.png)
 
 <br>
 

@@ -8,7 +8,7 @@ RELEASE = False
 
 __version__ = "%d.%d.%d" % (MAJOR, MINOR, PATCH)
 
-__app_name__ = "Kaki App"
+__appname__ = "Kaki App"
 
 if not RELEASE:
     __version__ += ".dev0"

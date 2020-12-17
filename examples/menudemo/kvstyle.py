@@ -39,7 +39,7 @@ class Main(App):
     # class to watch
     CLASSES = {
         # screen manager
-        "ManagerScreens": "kv_style.manager_screens", # look at the line 57
+        "ManagerScreens": "kv_style.manager_screens",
 
         # screen one
         "ScreenOne": "kv_style.screens.screen_one"
@@ -54,7 +54,7 @@ class Main(App):
 
     # build app
     def build_app(self):
-        FMS = self.fms = Factory.ManagerScreens() # look at the line 42
+        FMS = self.fms = Factory.ManagerScreens()
 
         return FMS
 
