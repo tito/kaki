@@ -1,0 +1,57 @@
+<ScreenOne>
+# https://kivy.org/doc/stable/api-kivy.html
+# https://kivymd.readthedocs.io/en/latest/
+
+    # layout
+    MDBoxLayout:
+        padding: 8
+        spacing: 8
+        orientation: "vertical"
+
+        # top label
+        MDLabel:
+            id: "top_label"
+            text: app.name
+            size_hint: 1.0, 0.25
+            halign: "center"
+            theme_text_color: "Secondary"
+
+
+
+        # image
+        Image:
+            source: "assets/kivy-logo-simple.png"
+            size: self.texture_size
+
+        # slider horizontal layout
+        BoxLayout:
+            spacing: 8
+            orientation: "horizontal"
+
+            Label:
+                text: str(slider.value)
+                size_hint: 0.25, 0.2
+            Slider:
+                id: slider
+                size_hint: 1.0, 0.2
+
+        # text input
+        TextInput:
+            id: "text_input"
+            multiline: True
+
+        # button
+        MDRoundFlatButton:
+            id: "button"
+            text: "From many\n&\nbecome one"
+            size_hint: 0.25, 0.5
+            pos_hint: {"center_x": 0.5}
+
+        # bottom label
+        MDLabel:
+            id: "bottom_label"
+            text: "v" + app.vernum
+            size_hint: 1.0, 0.25
+            halign: "center"
+            theme_text_color: "Hint"
+            font_size: "12dp"
