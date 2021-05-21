@@ -174,9 +174,19 @@ class App(BaseApp):
     def set_error(self, exc, tb=None):
         from kivy.core.window import Window
         lbl = Factory.Label(
-            text_size=(Window.width - 100, None),
+            size_hint = (1, None),
+            padding_y = 150,
+            text_size = (Window.width - 100, None),
             text="{}\n\n{}".format(exc, tb or ""))
-        self.set_widget(lbl)
+        lbl.texture_update()
+        lbl.height = lbl.texture_size[1]
+        sv = Factory.ScrollView(
+            size_hint = (1, 1),
+            pos_hint = {'x': 0, 'y': 0},
+            do_scroll_x = False,
+            scroll_y = 0)
+        sv.add_widget(lbl)
+        self.set_widget(sv)
 
     def bind_key(self, key, callback):
         """
