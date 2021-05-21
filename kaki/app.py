@@ -295,9 +295,9 @@ class App(BaseApp):
         rootpath = self.get_root_path()
         if filename.startswith(rootpath):
             filename = filename[len(rootpath):]
-        if filename.startswith("/"):
+        if filename.startswith(os.path.sep):
             filename = filename[1:]
-        module = filename[:-3].replace("/", ".")
+        module = filename[:-3].replace(os.path.sep, ".")
         Logger.debug("{}: Translated {} to {}".format(
             self.appname, orig_filename, module))
         return module
