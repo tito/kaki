@@ -95,7 +95,7 @@ class App(BaseApp):
         if self.FOREGROUND_LOCK:
             self.prepare_foreground_lock()
 
-        self.state = None
+        self.state = {}
         self.approot = None
         self.root = self.get_root()
         self.rebuild(first=True)
@@ -246,6 +246,7 @@ class App(BaseApp):
                 self.set_error(repr(e), traceback.format_exc())
                 return
 
+        Logger.debug("{}: Reload triggered by {}".format(self.appname, event))
         Clock.unschedule(self.rebuild)
         Clock.schedule_once(self.rebuild, 0.1)
 
