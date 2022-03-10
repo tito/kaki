@@ -20,6 +20,7 @@ setup(
     version=__version__,
     description="Kivy application library on steroids",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/tito/kaki",
     author="Mathieu Virbel",
     author_email="mat@meltingrocks.com",
