@@ -254,6 +254,7 @@ class App(BaseApp):
             except Exception as e:
                 import traceback
                 self.set_error(repr(e), traceback.format_exc())
+                print(f"Error: {e} \n{traceback.format_exc()}")
                 return
 
         Logger.debug("{}: Reload triggered by {}".format(self.appname, event))
