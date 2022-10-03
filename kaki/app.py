@@ -19,6 +19,7 @@ from kivy.clock import Clock, mainthread
 from kivy.factory import Factory
 from kivy.lang import Builder
 from kivy.base import ExceptionHandler, ExceptionManager
+from kivy.utils import platform
 try:
     from monotonic import monotonic
 except ImportError:
@@ -307,9 +308,13 @@ class App(BaseApp):
         rootpath = self.get_root_path()
         if filename.startswith(rootpath):
             filename = filename[len(rootpath):]
-        if filename.startswith(os.path.sep):
+        if platform == 'macosx':
+            prefix = os.sep
+        else:
+            prefix = os.path.sep
+        if filename.startswith(prefix):
             filename = filename[1:]
-        module = filename[:-3].replace(os.path.sep, ".")
+        module = filename[:-3].replace(prefix, ".")
         Logger.debug("{}: Translated {} to {}".format(
             self.appname, orig_filename, module))
         return module
