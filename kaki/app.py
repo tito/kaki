@@ -75,6 +75,9 @@ class App(BaseApp):
     #: Rearming idle can also be done with rearm_idle()
     IDLE_DETECTION = False
 
+    #: Auto install idle detection check when activated
+    IDLE_DETECTION_AUTO_START = True
+
     #: Default idle timeout
     IDLE_TIMEOUT = 60
 
@@ -87,8 +90,9 @@ class App(BaseApp):
     __events__ = ["on_idle", "on_wakeup"]
 
     def build(self):
+        Logger.info("Kaki: Application controlled by Kaki")
         if self.DEBUG:
-            Logger.info("{}: Debug mode activated".format(self.appname))
+            Logger.info("Kaki: Debug mode activated")
             self.enable_autoreload()
             self.patch_builder()
             self.bind_key(286, self.rebuild)
@@ -147,7 +151,7 @@ class App(BaseApp):
             Factory.register(name, module=module)
 
     def rebuild(self, *largs, **kwargs):
-        Logger.debug("{}: Rebuild the application".format(self.appname))
+        Logger.debug("Reloader: Rebuild the application")
         first = kwargs.get("first", False)
         try:
             if not first:
@@ -165,7 +169,7 @@ class App(BaseApp):
             self.apply_state(self.state)
         except Exception as e:
             import traceback
-            Logger.exception("{}: Error when building app".format(self.appname))
+            Logger.exception("Reloader: Error when building app")
             self.set_error(repr(e), traceback.format_exc())
             if not self.DEBUG and self.RAISE_ERROR:
                 raise
@@ -219,10 +223,9 @@ class App(BaseApp):
             from watchdog.observers import Observer
             from watchdog.events import FileSystemEventHandler
         except ImportError:
-            Logger.warn("{}: Autoreloader is missing watchdog".format(
-                self.appname))
+            Logger.warn("Reloader: Unavailable, watchdog is not installed")
             return
-        Logger.info("{}: Autoreloader activated".format(self.appname))
+        Logger.info("Reloader: Autoreloader activated")
         rootpath = self.get_root_path()
         self.w_handler = handler = FileSystemEventHandler()
         handler.dispatch = self._reload_from_watchdog
@@ -246,6 +249,7 @@ class App(BaseApp):
             if fnmatch(event.src_path, pat):
                 return
 
+        Logger.trace(f"Reloader: Event received {event.src_path}")
         if event.src_path.endswith(".py"):
             # source changed, reload it
             try:
@@ -256,7 +260,7 @@ class App(BaseApp):
                 self.set_error(repr(e), traceback.format_exc())
                 return
 
-        Logger.debug("{}: Reload triggered by {}".format(self.appname, event))
+        Logger.debug(f"Reloader: Triggered by {event}")
         Clock.unschedule(self.rebuild)
         Clock.schedule_once(self.rebuild, 0.1)
 
@@ -279,7 +283,7 @@ class App(BaseApp):
 
         module = self._filename_to_module(filename)
         if module in sys.modules:
-            Logger.debug("{}: Module exist, reload it".format(self.appname))
+            Logger.debug("Reloader: Module exist, reload it")
             Factory.unregister_from_filename(filename)
             self._unregister_factory_from_module(module)
             reload(sys.modules[module])
@@ -309,8 +313,7 @@ class App(BaseApp):
         if filename.startswith(os.path.sep):
             filename = filename[1:]
         module = filename[:-3].replace(os.path.sep, ".")
-        Logger.debug("{}: Translated {} to {}".format(
-            self.appname, orig_filename, module))
+        Logger.debug(f"Reloader: Translated {orig_filename} to {module}")
         return module
 
     def _restart_app(self, mod):
@@ -343,9 +346,9 @@ class App(BaseApp):
             import ctypes
             LSFW_LOCK = 1
             ctypes.windll.user32.LockSetForegroundWindow(LSFW_LOCK)
-            Logger.info("App: Foreground lock activated")
+            Logger.info("Kiosk: Foreground lock activated")
         except Exception:
-            Logger.warn("App: No foreground lock available")
+            Logger.warn("Kiosk: No foreground lock available")
 
     def set_widget(self, wid):
         """
@@ -381,24 +384,27 @@ class App(BaseApp):
         expired. The timer can be rearm using :func:`rearm_idle`.
         """
         if monotonic is None:
-            Logger.exception(
-                "{}: Cannot use idle detector, monotonic is missing".format(
-                    self.appname))
+            Logger.exception("Idle: Cannot use idle detector, monotonic is missing")
         self.idle_timer = None
         self.idle_timeout = timeout
-        Logger.info("{}: Install idle detector, {} seconds".format(
-            self.appname, timeout))
+        Logger.info(f"Idle: Install idle detector, {timeout} seconds")
         Clock.schedule_interval(self._check_idle, 1)
         self.root.bind(
             on_touch_down=self.rearm_idle,
             on_touch_up=self.rearm_idle)
+        if self.IDLE_DETECTION_AUTO_START:
+            self.rearm_idle()
 
     def _check_idle(self, *largs):
         if not hasattr(self, "idle_timer"):
+            Logger.trace("Idle: Check aborted: no idle_timer installed")
             return
         if self.idle_timer is None:
+            Logger.trace("Idle: Check aborted, idle_timer is None")
             return
+        Logger.debug(f"Idle: Check: {monotonic() - self.idle_timer} > {self.idle_timeout}")
         if monotonic() - self.idle_timer > self.idle_timeout:
+            Logger.debug(f"Idle: Trigger on_idle")
             self.idle_timer = None
             self.dispatch("on_idle")
 
@@ -406,9 +412,11 @@ class App(BaseApp):
         """
         Rearm the idle timer
         """
+        Logger.debug("Idle: Rearm idle timer")
         if not hasattr(self, "idle_timer"):
             return
         if self.idle_timer is None:
+            Logger.debug("Idle: Trigger on_wakeup")
             self.dispatch("on_wakeup")
         self.idle_timer = monotonic()
 
