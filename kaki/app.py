@@ -387,6 +387,7 @@ class App(BaseApp):
             Logger.exception("Idle: Cannot use idle detector, monotonic is missing")
         self.idle_timer = None
         self.idle_timeout = timeout
+        self.idle_paused = False
         Logger.info(f"Idle: Install idle detector, {timeout} seconds")
         Clock.schedule_interval(self._check_idle, 1)
         self.root.bind(
@@ -398,6 +399,9 @@ class App(BaseApp):
     def _check_idle(self, *largs):
         if not hasattr(self, "idle_timer"):
             Logger.trace("Idle: Check aborted: no idle_timer installed")
+            return
+        if self.idle_paused:
+            Logger.trace("Idle: Check paused, idle_paused is True")
             return
         if self.idle_timer is None:
             Logger.trace("Idle: Check aborted, idle_timer is None")
@@ -415,10 +419,23 @@ class App(BaseApp):
         Logger.debug("Idle: Rearm idle timer")
         if not hasattr(self, "idle_timer"):
             return
-        if self.idle_timer is None:
+        if self.idle_timer is None and not self.idle_paused:
             Logger.debug("Idle: Trigger on_wakeup")
             self.dispatch("on_wakeup")
         self.idle_timer = monotonic()
+
+    def stop_idle(self, *largs):
+        """
+        Pause idle timer
+        """
+        self.idle_paused = True
+
+    def restart_idle(self, *largs):
+        """
+        Can be used after stop_idle to restart idle timer
+        """
+        self.idle_paused = False
+        self.rearm_idle()
 
     def on_idle(self, *largs):
         """
