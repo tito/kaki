@@ -19,15 +19,8 @@ from kivy.clock import Clock, mainthread
 from kivy.factory import Factory
 from kivy.lang import Builder
 from kivy.base import ExceptionHandler, ExceptionManager
-try:
-    from monotonic import monotonic
-except ImportError:
-    monotonic = None
-try:
-    from importlib import reload
-    PY3 = True
-except ImportError:
-    PY3 = False
+from time import monotonic
+from importlib import reload
 
 
 class E(ExceptionHandler):
@@ -383,8 +376,6 @@ class App(BaseApp):
         Once installed, it will check every second if the idle timer
         expired. The timer can be rearm using :func:`rearm_idle`.
         """
-        if monotonic is None:
-            Logger.exception("Idle: Cannot use idle detector, monotonic is missing")
         self.idle_timer = None
         self.idle_timeout = timeout
         self.idle_paused = False

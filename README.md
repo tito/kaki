@@ -61,6 +61,9 @@ Live().run()
     #: Rearming idle can also be done with rearm_idle()
     IDLE_DETECTION = False
 
+    #: Auto install idle detection check when activated
+    IDLE_DETECTION_AUTO_START = True
+
     #: Default idle timeout
     IDLE_TIMEOUT = 60
 
@@ -69,12 +72,12 @@ Live().run()
     #: of showing it on the screen. If you still want to show the error
     #: when not in DEBUG, put this to False
     RAISE_ERROR = True
-    
+
 ## Idle Management
 
-If configuration `IDLE_DETECTION` is `True`, then it will automatically listen for touch down/move.
-When no event happen, after `IDLE_TIMEOUT` seconds, it will trigger the `on_idle` event on the application class.
-As soon as a touch event occurs, `on_wakeup` event will be triggered on the application class.
+The idle detection feature is designed to trigger an action if the user has not touched the screen for a certain period of time. This can be used to display an attractor screen, screensaver, or other content.
 
-If you are playing video on want to not trigger the idle detection, use `rearm_idle` on the application class to rearm the detection from 0
-seconds.
+To enable idle detection, set the `IDLE_DETECTION` configuration to `True`.
+Kaki will then listen for touch down/move events. If no such events occur within the `IDLE_TIMEOUT` interval, or if the `rearm_idle` function has not been called, the `on_idle` event will be triggered on the application class. If a touch event occurs or `rearm_idle` is called while the system is in idle mode, the `on_wakeup` event will be triggered on the application class.
+
+If you are playing a video and do not want idle detection to be triggered, you can use the `rearm_idle` function on the application class to reset the idle timer to 0 seconds.
