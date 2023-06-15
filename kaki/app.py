@@ -28,7 +28,7 @@ class E(ExceptionHandler):
         if isinstance(inst, (KeyboardInterrupt, SystemExit)):
             return ExceptionManager.RAISE
         app = App.get_running_app()
-        if not app.DEBUG and not app.RAISE_ERROR:
+        if not app.DEBUG and app.RAISE_ERROR:
             return ExceptionManager.RAISE
         app.set_error(inst, tb=traceback.format_exc())
         traceback.print_exc()
