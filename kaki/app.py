@@ -80,6 +80,10 @@ class App(BaseApp):
     #: when not in DEBUG, put this to False
     RAISE_ERROR = True
 
+    #: Shortcut key to rebuild application
+    #: Default key F5 
+    SHORTCUT_REBUILD = 286
+
     __events__ = ["on_idle", "on_wakeup"]
 
     def build(self):
@@ -88,7 +92,7 @@ class App(BaseApp):
             Logger.info("Kaki: Debug mode activated")
             self.enable_autoreload()
             self.patch_builder()
-            self.bind_key(286, self.rebuild)
+            self.bind_key(self.SHORTCUT_REBUILD, self.rebuild)
         if self.FOREGROUND_LOCK:
             self.prepare_foreground_lock()
 
