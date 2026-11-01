@@ -86,6 +86,13 @@ class App(BaseApp):
 
     __events__ = ["on_idle", "on_wakeup"]
 
+    def load_kv(self, filename=None):
+        # Kivy autoloads the app-name .kv file, which kaki does not
+        # manage, so in debug mode it would draw stale, unbound UI.
+        if self.DEBUG:
+            return False
+        return super().load_kv(filename=filename)
+
     def build(self):
         Logger.info("Kaki: Application controlled by Kaki")
         if self.DEBUG:
